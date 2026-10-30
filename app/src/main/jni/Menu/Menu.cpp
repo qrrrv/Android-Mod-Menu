@@ -2,27 +2,11 @@
 #include "Menu/Menu.hpp"
 
 void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle) {
-    //Set sub title
-    setText(env, title, OBFUSCATE("<b>Modded by (yourname)</b>"));
+    //Title
+    setText(env, title, OBFUSCATE("<b>Subway Mods</b>"));
 
-    //Set sub title
-    setText(env, subtitle, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                                     "<p style=\"color:green;\">Modded by LGL</p> | "
-                                     "https://github.com/LGLTeam | Lorem Ipsum is simply dummy text of the printing and typesetting</p>"
-                                     "</marquee></b>"));
-
-    //Dialog Example
-    Dialog(env,
-           ctx,
-           OBFUSCATE("Welcome to your mod menu"),
-           OBFUSCATE("Thanks for the installation and call to action"),
-           OBFUSCATE("Visit"), // set nullptr if btn-link is not needed
-           OBFUSCATE("Close"),
-           3, // set 0 if auto-close is not needed
-           OBFUSCATE("https://github.com/LGLTeam")); // set nullptr if btn-link is not needed
-
-    //Toast Example
-    Toast(env, ctx, OBFUSCATE("Modded by YOU"), ToastLength::LENGTH_LONG);
+    //Sub title
+    setText(env, subtitle, OBFUSCATE("<b>Subway Surfers 3.70.3</b>"));
 }
 
 jstring Icon(JNIEnv *env, jobject thiz) {
