@@ -73,8 +73,8 @@ public class Menu {
     int BTN_COLOR = Color.parseColor("#1C262D");
     int MENU_BG_COLOR = Color.parseColor("#EE1C2A35"); //#AARRGGBB
     int MENU_FEATURE_BG_COLOR = Color.parseColor("#DD141C22"); //#AARRGGBB
-    int MENU_WIDTH = 290;
-    int MENU_HEIGHT = 210;
+    int MENU_WIDTH = 310;
+    int MENU_HEIGHT = 250;
     int POS_X = 0;
     int POS_Y = 100;
 
@@ -262,19 +262,20 @@ public class Menu {
         Button hideBtn = new Button(context);
         hideBtn.setLayoutParams(lParamsHideBtn);
         hideBtn.setBackgroundColor(Color.TRANSPARENT);
-        hideBtn.setText("HIDE/KILL (Hold)");
+        hideBtn.setText("СКРЫТЬ (удерж.)");
+        hideBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         hideBtn.setTextColor(TEXT_COLOR);
         hideBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mCollapsed.setVisibility(View.VISIBLE);
                 mCollapsed.setAlpha(0);
                 mExpanded.setVisibility(View.GONE);
-                Toast.makeText(view.getContext(), "Icon hidden. Remember the hidden icon position", Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), "Иконка скрыта. Запомни её место", Toast.LENGTH_LONG).show();
             }
         });
         hideBtn.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View view) {
-                Toast.makeText(view.getContext(), "Menu killed", Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), "Меню закрыто", Toast.LENGTH_LONG).show();
                 rootFrame.removeView(mRootContainer);
                 mWindowManager.removeView(rootFrame);
                 return false;
@@ -288,7 +289,8 @@ public class Menu {
         Button closeBtn = new Button(context);
         closeBtn.setLayoutParams(lParamsCloseBtn);
         closeBtn.setBackgroundColor(Color.TRANSPARENT);
-        closeBtn.setText("MINIMIZE");
+        closeBtn.setText("СВЕРНУТЬ");
+        closeBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         closeBtn.setTextColor(TEXT_COLOR);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -532,6 +534,18 @@ public class Menu {
     }
 
     private void Switch(LinearLayout linLayout, final int featNum, final String featName, boolean swiOn) {
+        //Row: label takes all free width on the left, a compact switch sits on the right
+        LinearLayout row = new LinearLayout(getContext);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(12), dp(8), dp(12), dp(8));
+
+        TextView label = new TextView(getContext);
+        label.setText(featName);
+        label.setTextColor(TEXT_COLOR_2);
+        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        label.setLayoutParams(new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1.0f));
+
         final Switch switchR = new Switch(getContext);
         ColorStateList buttonStates = new ColorStateList(
                 new int[][]{
@@ -552,9 +566,12 @@ public class Menu {
         } catch (NullPointerException ex) {
             Log.d(TAG, String.valueOf(ex));
         }
-        switchR.setText(featName);
-        switchR.setTextColor(TEXT_COLOR_2);
-        switchR.setPadding(10, 5, 0, 5);
+        //No ON/OFF words inside the switch: they made it very wide and squeezed the label
+        try {
+            switchR.setShowText(false);
+        } catch (Throwable ignored) {
+        }
+        switchR.setLayoutParams(new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         switchR.setChecked(Preferences.loadPrefBool(featName, featNum, swiOn));
         switchR.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton compoundButton, boolean bool) {
@@ -572,22 +589,32 @@ public class Menu {
             }
         });
 
-        linLayout.addView(switchR);
+        //Tap anywhere on the row to toggle
+        row.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                switchR.toggle();
+            }
+        });
+
+        row.addView(label);
+        row.addView(switchR);
+        linLayout.addView(row);
     }
 
     private void SeekBar(LinearLayout linLayout, final int featNum, final String featName, final int min, int max) {
         int loadedProg = Preferences.loadPrefInt(featName, featNum);
         LinearLayout linearLayout = new LinearLayout(getContext);
-        linearLayout.setPadding(10, 5, 0, 5);
+        linearLayout.setPadding(dp(12), dp(6), dp(12), dp(6));
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setGravity(Gravity.LEFT);
 
         final TextView textView = new TextView(getContext);
         textView.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((loadedProg == 0) ? min : loadedProg)));
         textView.setTextColor(TEXT_COLOR_2);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 
         SeekBar seekBar = new SeekBar(getContext);
-        seekBar.setPadding(25, 10, 35, 10);
+        seekBar.setPadding(dp(8), dp(10), dp(8), dp(10));
         seekBar.setMax(max);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             seekBar.setMin(min); //setMin for Oreo and above
